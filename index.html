@@ -7,9 +7,9 @@
 <title>엑셀 손익 대시보드</title>
 <style>
   :root{
-    --bg:#f4f6f9; --card:#ffffff; --border:#e2e6ec; --text:#1f2937; --muted:#6b7280;
-    --accent:#2563eb; --accent-light:#dbeafe; --danger:#dc2626; --danger-light:#fee2e2;
-    --good:#059669;
+    --bg:#000000; --card:#0d0d0d; --border:#3a1230; --text:#ff2ec4; --muted:#ff2ec4;
+    --accent:#ff2ec4; --accent-light:rgba(255,46,196,0.15); --danger:#ff2ec4; --danger-light:rgba(255,46,196,0.15);
+    --good:#ff2ec4;
   }
   *{box-sizing:border-box;}
   body{
@@ -22,7 +22,7 @@
 
   /* 드롭존 */
   #dropzone{
-    border:2px dashed #94a3b8; border-radius:12px; padding:32px; text-align:center;
+    border:2px dashed #7a2e63; border-radius:12px; padding:32px; text-align:center;
     background:var(--card); color:var(--muted); cursor:pointer; margin-bottom:20px;
     transition:border-color .15s, background .15s;
   }
@@ -41,23 +41,23 @@
   .filterbar label{font-size:11px; color:var(--muted); font-weight:600;}
   .filterbar select{
     padding:6px 10px; border:1px solid var(--border); border-radius:6px; font-size:13px;
-    min-width:120px; background:#fff; color:var(--text);
+    min-width:120px; background:#0d0d0d; color:var(--text);
   }
   .filterbar .spacer{flex:1;}
   #printBtn{
-    padding:8px 16px; background:var(--accent); color:#fff; border:none; border-radius:6px;
+    padding:8px 16px; background:var(--accent); color:#000; border:none; border-radius:6px;
     font-size:13px; font-weight:600; cursor:pointer;
   }
-  #printBtn:hover{background:#1d4ed8;}
+  #printBtn:hover{background:#ff6fdb;}
   #resetBtn{
-    padding:8px 14px; background:#fff; color:var(--text); border:1px solid var(--border);
+    padding:8px 14px; background:#0d0d0d; color:var(--text); border:1px solid var(--border);
     border-radius:6px; font-size:13px; cursor:pointer;
   }
 
   #app{display:none;}
   #emptyMsg{color:var(--muted); font-size:13px; text-align:center; padding:40px 0;}
   #errorMsg{
-    display:none; background:var(--danger-light); color:var(--danger); border:1px solid #fecaca;
+    display:none; background:var(--danger-light); color:var(--danger); border:1px solid #7a2e63;
     border-radius:8px; padding:12px 16px; font-size:13px; margin-bottom:16px;
   }
 
@@ -83,7 +83,7 @@
   th,td{padding:6px 8px; border-bottom:1px solid var(--border); text-align:right;}
   th:first-child, td:first-child{text-align:left;}
   thead th{color:var(--muted); font-weight:600; font-size:11px; border-bottom:2px solid var(--border);}
-  tbody tr:hover{background:#f9fafb;}
+  tbody tr:hover{background:#1a0916;}
   .neg{color:var(--danger); font-weight:600;}
   .rank{color:var(--muted); width:24px;}
   .top1-badge{
@@ -95,17 +95,21 @@
   .bar-label{font-size:11px; fill:var(--text);}
   .bar-value{font-size:11px; fill:var(--muted);}
   .axis-line{stroke:var(--border); stroke-width:1;}
-  .grid-line{stroke:#eef1f5; stroke-width:1;}
+  .grid-line{stroke:#3a1230; stroke-width:1;}
 
   footer{margin-top:24px; text-align:center; color:var(--muted); font-size:11px;}
 
   /* ===== 인쇄 전용 ===== */
   @media print{
-    body{background:#fff; padding:0;}
+    body{background:#fff; color:#1f2937; padding:0;}
     .no-print{display:none !important;}
-    .panel{break-inside:avoid; border:1px solid #ccc;}
+    .panel{break-inside:avoid; border:1px solid #ccc; background:#fff;}
+    .card{background:#fff;}
     .cards{break-inside:avoid;}
     #app{display:block !important;}
+    .card .label, .subtitle, .panel .hint, thead th, .bar-value{color:#6b7280 !important;}
+    .card .value, h1, .panel h2, .bar-label{color:#1f2937 !important;}
+    .neg{color:#dc2626 !important;}
   }
 </style>
 </head>

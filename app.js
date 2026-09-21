@@ -380,7 +380,7 @@
   }
 
   function emptyState(container, msg) {
-    container.innerHTML = '<div style="color:#9ca3af;font-size:13px;text-align:center;padding:24px 0;">' + escapeHtml(msg) + '</div>';
+    container.innerHTML = '<div style="color:#ff2ec4;font-size:13px;text-align:center;padding:24px 0;">' + escapeHtml(msg) + '</div>';
   }
 
   // 월별 NNR 추이 — 라인 차트
@@ -486,7 +486,7 @@
         '<span style="display:flex;align-items:center;gap:6px;">' +
         '<span style="width:10px;height:10px;border-radius:2px;background:' + COLORS[i % COLORS.length] + ';display:inline-block;"></span>' +
         escapeHtml(truncate(e.label, 12)) + '</span>' +
-        '<span style="color:#6b7280;">' + pct.toFixed(1) + '%</span>';
+        '<span style="color:#ff2ec4;">' + pct.toFixed(1) + '%</span>';
       legend.appendChild(row);
     });
     wrap.appendChild(legend);
@@ -601,7 +601,7 @@
       .sort(function (a, b) { return a.MCpct - b.MCpct; });
 
     if (list.length === 0) {
-      container.innerHTML = '<div style="color:#059669;font-size:13px;padding:12px 0;">없음 (모든 품목의 MC%가 0% 이상입니다)</div>';
+      container.innerHTML = '<div style="color:#ff2ec4;font-size:13px;padding:12px 0;">없음 (모든 품목의 MC%가 0% 이상입니다)</div>';
       return;
     }
 
