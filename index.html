@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none';">
+<title>엑셀 손익 대시보드</title>
+<style>
+  :root{
+    --bg:#f4f6f9; --card:#ffffff; --border:#e2e6ec; --text:#1f2937; --muted:#6b7280;
+    --accent:#2563eb; --accent-light:#dbeafe; --danger:#dc2626; --danger-light:#fee2e2;
+    --good:#059669;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:"Malgun Gothic","맑은 고딕",-apple-system,sans-serif;
+    background:var(--bg); color:var(--text); padding:24px;
+  }
+  h1{font-size:22px; margin:0 0 4px;}
+  .subtitle{color:var(--muted); font-size:13px; margin-bottom:20px;}
+
+  /* 드롭존 */
+  #dropzone{
+    border:2px dashed #94a3b8; border-radius:12px; padding:32px; text-align:center;
+    background:var(--card); color:var(--muted); cursor:pointer; margin-bottom:20px;
+    transition:border-color .15s, background .15s;
+  }
+  #dropzone.dragover{border-color:var(--accent); background:var(--accent-light); color:var(--accent);}
+  #dropzone .big{font-size:15px; font-weight:600; margin-bottom:4px;}
+  #dropzone .small{font-size:12px;}
+  #fileInput{display:none;}
+  #fileName{font-size:12px; color:var(--accent); margin-top:8px;}
+
+  /* 필터 바 */
+  .filterbar{
+    display:flex; flex-wrap:wrap; gap:12px; align-items:end; background:var(--card);
+    border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin-bottom:20px;
+  }
+  .filterbar .field{display:flex; flex-direction:column; gap:4px;}
+  .filterbar label{font-size:11px; color:var(--muted); font-weight:600;}
+  .filterbar select{
+    padding:6px 10px; border:1px solid var(--border); border-radius:6px; font-size:13px;
+    min-width:120px; background:#fff; color:var(--text);
+  }
+  .filterbar .spacer{flex:1;}
+  #printBtn{
+    padding:8px 16px; background:var(--accent); color:#fff; border:none; border-radius:6px;
+    font-size:13px; font-weight:600; cursor:pointer;
+  }
+  #printBtn:hover{background:#1d4ed8;}
+  #resetBtn{
+    padding:8px 14px; background:#fff; color:var(--text); border:1px solid var(--border);
+    border-radius:6px; font-size:13px; cursor:pointer;
+  }
+
+  #app{display:none;}
+  #emptyMsg{color:var(--muted); font-size:13px; text-align:center; padding:40px 0;}
+  #errorMsg{
+    display:none; background:var(--danger-light); color:var(--danger); border:1px solid #fecaca;
+    border-radius:8px; padding:12px 16px; font-size:13px; margin-bottom:16px;
+  }
+
+  /* 요약 카드 */
+  .cards{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px;}
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px 18px;
+  }
+  .card .label{font-size:12px; color:var(--muted); margin-bottom:6px;}
+  .card .value{font-size:24px; font-weight:700;}
+  .card .unit{font-size:12px; font-weight:400; color:var(--muted); margin-left:2px;}
+
+  /* 패널 그리드 */
+  .grid2{display:grid; grid-template-columns:1.4fr 1fr; gap:16px; margin-bottom:16px;}
+  .grid2b{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;}
+  .panel{
+    background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px 18px;
+  }
+  .panel h2{font-size:14px; margin:0 0 12px; font-weight:700;}
+  .panel .hint{font-size:11px; color:var(--muted); margin-top:6px;}
+
+  table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  th,td{padding:6px 8px; border-bottom:1px solid var(--border); text-align:right;}
+  th:first-child, td:first-child{text-align:left;}
+  thead th{color:var(--muted); font-weight:600; font-size:11px; border-bottom:2px solid var(--border);}
+  tbody tr:hover{background:#f9fafb;}
+  .neg{color:var(--danger); font-weight:600;}
+  .rank{color:var(--muted); width:24px;}
+  .top1-badge{
+    display:inline-block; background:var(--accent-light); color:var(--accent); font-size:11px;
+    font-weight:700; border-radius:5px; padding:2px 8px; margin-left:6px;
+  }
+
+  svg text{font-family:"Malgun Gothic","맑은 고딕",-apple-system,sans-serif;}
+  .bar-label{font-size:11px; fill:var(--text);}
+  .bar-value{font-size:11px; fill:var(--muted);}
+  .axis-line{stroke:var(--border); stroke-width:1;}
+  .grid-line{stroke:#eef1f5; stroke-width:1;}
+
+  footer{margin-top:24px; text-align:center; color:var(--muted); font-size:11px;}
+
+  /* ===== 인쇄 전용 ===== */
+  @media print{
+    body{background:#fff; padding:0;}
+    .no-print{display:none !important;}
+    .panel{break-inside:avoid; border:1px solid #ccc;}
+    .cards{break-inside:avoid;}
+    #app{display:block !important;}
+  }
+</style>
+</head>
+<body>
+
+<h1>엑셀 손익 대시보드</h1>
+<div class="subtitle">품목손익 시트를 브라우저에서 직접 읽어 화면에 그립니다. 파일은 서버로 전송되지 않습니다.</div>
+
+<div id="errorMsg"></div>
+
+<div id="dropzone" class="no-print">
+  <div class="big">📊 엑셀 파일(.xlsx)을 여기로 끌어다 놓으세요</div>
+  <div class="small">또는 클릭해서 파일을 선택하세요 (시트명: "품목손익")</div>
+  <div id="fileName"></div>
+  <input type="file" id="fileInput" accept=".xlsx,.xls">
+</div>
+
+<div class="filterbar no-print" id="filterBar" style="display:none;">
+  <div class="field">
+    <label>연도</label>
+    <select id="f_year"></select>
+  </div>
+  <div class="field">
+    <label>채널</label>
+    <select id="f_channel"></select>
+  </div>
+  <div class="field">
+    <label>대분류</label>
+    <select id="f_cat"></select>
+  </div>
+  <button id="resetBtn">필터 초기화</button>
+  <div class="spacer"></div>
+  <button id="printBtn">🖨 보고서 인쇄</button>
+</div>
+
+<div id="emptyMsg">파일을 올리면 대시보드가 표시됩니다.</div>
+
+<div id="app">
+  <div class="cards">
+    <div class="card"><div class="label">총 NNR</div><div class="value" id="c_nnr">-</div></div>
+    <div class="card"><div class="label">총 MC</div><div class="value" id="c_mc">-</div></div>
+    <div class="card"><div class="label">MC%</div><div class="value" id="c_mcpct">-</div></div>
+    <div class="card"><div class="label">거래처 수</div><div class="value" id="c_cust">-</div></div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>월별 NNR 추이 (백만원)</h2>
+      <div id="chart_monthly"></div>
+    </div>
+    <div class="panel">
+      <h2>채널별 구성 (NNR 기준)</h2>
+      <div id="chart_channel"></div>
+    </div>
+  </div>
+
+  <div class="grid2b">
+    <div class="panel">
+      <h2>품목 TOP 10 (NNR 기준)</h2>
+      <div id="chart_topitem"></div>
+    </div>
+    <div class="panel">
+      <h2>거래처 TOP 10 (NNR 기준)</h2>
+      <div id="chart_topcust"></div>
+      <div class="hint" id="top1share"></div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-bottom:16px;">
+    <h2>MC%가 마이너스인 품목</h2>
+    <div id="negtable"></div>
+  </div>
+
+  <footer>본 대시보드는 브라우저 내에서만 데이터를 처리하며, 어떤 데이터도 외부로 전송하지 않습니다.</footer>
+</div>
+
+<script src="vendor/xlsx.full.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

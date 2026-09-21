@@ -1,0 +1,9 @@
+# 데이터 파일
+*.xlsx
+*.xls
+*.csv
+data/
+
+# 환경 변수 / API 키
+.env
+.env.*
